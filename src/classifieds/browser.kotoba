@@ -65,14 +65,23 @@
     (.append article (text-el "p" "classifieds-meta listing-card__source" "出所: ローカル掲載デモ"))
     (.prepend (by-id "listing-grid") article)))
 
+(defonce memory-store (atom {}))
+
 (defn stored-listings []
+  ;; The restricted guest runs in an opaque-origin sandbox without
+  ;; localStorage: the native accessor throws on touch. Keep postings for
+  ;; this launch only (descriptor local-state adapter "memory").
   (try
     (let [raw (.getItem js/localStorage storage-key)]
       (if raw (js->clj (js/JSON.parse raw) :keywordize-keys true) []))
-    (catch :default _ [])))
+    (catch :default _
+      (get @memory-store storage-key []))))
 
 (defn persist! [listings]
-  (.setItem js/localStorage storage-key (js/JSON.stringify (clj->js listings))))
+  (try
+    (.setItem js/localStorage storage-key (js/JSON.stringify (clj->js listings)))
+    (catch :default _
+      (swap! memory-store assoc storage-key listings))))
 
 (defn form-value [form field]
   (.-value (.querySelector form (str "[name='" field "']"))))
