@@ -1,15 +1,13 @@
 // kotoba.app.client-runtime.v1 descriptor for the Tauri host. Pure data: tests import it too.
 // Every external operation must be declared here with consent "each-operation"; anything
 // not declared is refused by the host and blocked by the CSP derived from this file.
-// This app declares none: the board works fully offline (local listings only),
-// so the broker refuses every call before any dialog.
 export const descriptor = {
   "schema": "kotoba.app.client-runtime.v1",
   "target": "browser",
-  "profile": "restricted-wasm-v1",
+  "profile": "trusted-page-v1",
   "entry": "index.html",
   "local-state": {
-    "adapter": "memory",
+    "adapter": "localstorage",
     "schema": "cloud-itonami.app-classifieds.local-listings.v1",
     "version": 1
   },
